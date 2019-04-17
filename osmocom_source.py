@@ -129,14 +129,14 @@ class osmocom_source(grc_wxgui.top_block_gui): # derived from top_block_gui, giv
         ##################################################
         self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_nlog10_ff_0, 0))
         self.connect((self.blocks_multiply_conjugate_cc_0, 0), (self.blocks_complex_to_real_0, 0))    
-        self.connect((self.blocks_nlog10_ff_0, 0), (self.wxgui_numbersink2_0, 0))
+        self.connect((self.blocks_nlog10_ff_0, 0), (self.wxgui_numbersink2_0, 0))    
         #self.connect((self.blocks_nlog10_ff_0_0, 0), (self.wxgui_numbersink2_1, 0))
         self.connect((self.blocks_nlog10_ff_0_0, 0), (self.multiply_py_ff, 0)) # new
-        self.connect((self.blocks_rms_xx_0, 0), (self.blocks_nlog10_ff_0_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 0))
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 1))
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_rms_xx_0, 0))
-        self.connect((self.osmosdr_source_0, 0), (self.low_pass_filter_0, 0))
+        self.connect((self.blocks_rms_xx_0, 0), (self.blocks_nlog10_ff_0_0, 0))    
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 0))    
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 1))    
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_rms_xx_0, 0))    
+        self.connect((self.osmosdr_source_0, 0), (self.low_pass_filter_0, 0))   
 
     def get_zwave_freq(self):
         return self.zwave_freq
