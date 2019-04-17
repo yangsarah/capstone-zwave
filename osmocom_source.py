@@ -29,6 +29,7 @@ from optparse import OptionParser # parser for command line options
 import osmosdr # SDR software
 import time # time access and conversions
 import wx # GUI toolkit
+from multiply_py_ff import multiply_py_ff # newly created block
 
 
 class osmocom_source(grc_wxgui.top_block_gui): # derived from top_block_gui, gives us functions to add and connect blocks
@@ -109,7 +110,7 @@ class osmocom_source(grc_wxgui.top_block_gui): # derived from top_block_gui, giv
         self.blocks_rms_xx_0 = blocks.rms_cf(0.0001)
 
         # convert to dB scale (path 2)
-        self.blocks_nlog10_ff_0_0 = blocks.nlog10_ff(20, 1, -14)
+        self._0 = blocks.nlog10_ff(20, 1, -14)
 
         # convert to dB scale (path 1)
         self.blocks_nlog10_ff_0 = blocks.nlog10_ff(10, 1, -15)
@@ -120,18 +121,22 @@ class osmocom_source(grc_wxgui.top_block_gui): # derived from top_block_gui, giv
         # complex to real (path 1)
         self.blocks_complex_to_real_0 = blocks.complex_to_real(1)
 
+        # new multiply all by 2 sink block
+        self.multiply_py_ff = multiply_py_ff(2)
+
         ##################################################
         # Connections
         ##################################################
-        self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_nlog10_ff_0, 0))    
+        self.connect((self.blocks_complex_to_real_0, 0), (self.blocks_nlog10_ff_0, 0))
         self.connect((self.blocks_multiply_conjugate_cc_0, 0), (self.blocks_complex_to_real_0, 0))    
-        self.connect((self.blocks_nlog10_ff_0, 0), (self.wxgui_numbersink2_0, 0))    
-        self.connect((self.blocks_nlog10_ff_0_0, 0), (self.wxgui_numbersink2_1, 0))    
-        self.connect((self.blocks_rms_xx_0, 0), (self.blocks_nlog10_ff_0_0, 0))    
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 0))    
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 1))    
-        self.connect((self.low_pass_filter_0, 0), (self.blocks_rms_xx_0, 0))    
-        self.connect((self.osmosdr_source_0, 0), (self.low_pass_filter_0, 0))    
+        self.connect((self.blocks_nlog10_ff_0, 0), (self.wxgui_numbersink2_0, 0))
+        #self.connect((self.blocks_nlog10_ff_0_0, 0), (self.wxgui_numbersink2_1, 0))
+        self.connect((self.blocks_nlog10_ff_0_0, 0), (self.multiply_py_ff, 0)) # new
+        self.connect((self.blocks_rms_xx_0, 0), (self.blocks_nlog10_ff_0_0, 0))
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 0))
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_multiply_conjugate_cc_0, 1))
+        self.connect((self.low_pass_filter_0, 0), (self.blocks_rms_xx_0, 0))
+        self.connect((self.osmosdr_source_0, 0), (self.low_pass_filter_0, 0))
 
     def get_zwave_freq(self):
         return self.zwave_freq
