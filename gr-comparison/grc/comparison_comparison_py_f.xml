@@ -1,0 +1,34 @@
+<?xml version="1.0"?>
+<block>
+  <name>comparison_py_f</name>
+  <key>comparison_comparison_py_f</key>
+  <category>[capstone]</category>
+  <import>import comparison</import>
+  <make>comparison.comparison_py_f($normal_threshold, $secure_threshold)</make>
+  <!-- Make one 'param' node for every Parameter you want settable from the GUI.
+       Sub-nodes:
+       * name
+       * key (makes the value accessible as $keyname, e.g. in the make node)
+       * type -->
+  <param>
+    <name>Normal Threshold</name>
+    <key>normal_threshold</key>
+    <type>float</type>
+  </param>
+  <param>
+    <name>Secure Threshold</name>
+    <key>secure_threshold</key>
+    <type>float</type>
+  </param>
+
+  <!-- Make one 'sink' node per input. Sub-nodes:
+       * name (an identifier for the GUI)
+       * type
+       * vlen
+       * optional (set to 1 for optional inputs) -->
+  <sink>
+    <name>in</name>
+    <type>float</type>
+    <vlen>1250000</vlen>
+  </sink>
+</block>

@@ -21,7 +21,17 @@
 
 import numpy
 import time
+import sys
+import RPi.GPIO as GPIO
 from gnuradio import gr
+
+# TODO change names to some, normal, and secure, assign pins
+led1_redpin = 11
+led1_greenpin = 13
+led2_redpin = 15
+led2_greenpin = 12
+led3_redpin = 16
+led3_greenpin = 18
 
 class comparison_py_f(gr.sync_block):
     """
@@ -35,21 +45,19 @@ class comparison_py_f(gr.sync_block):
             in_sig=[(numpy.float32,1250000)],
             out_sig=None)
 
+    def on(pin):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(pin,GPIO.OUT)
+        GPIO.output(pin,GPIO.HIGH)
+
+    def off(pin):
+        GPIO.setmode(GPIO.BOARD)
+        GPIO.setup(pin,GPIO.OUT)
+        GPIO.output(pin,GPIO.LOW)
 
     def work(self, input_items, output_items):
-        print '----------------------------begin work----------------------'
         in0 = input_items[0]
         samples = in0[0]
-
-        # with open('panel_at_drop_off.csv', 'w') as the_file:
-        #     for item in samples:
-        #         try:
-        #             item = float(item)
-        #         except ValueError:
-        #             pass
-        #         the_file.write(str(item))
-        #         the_file.write('\n')
-        # print 'printed'
 
         num_samples = len(samples)
 
@@ -102,9 +110,6 @@ class comparison_py_f(gr.sync_block):
         for spike in spikes:
             add_mode_power.append(max(spike))
 
-        # for power in add_mode_power:
-        #     print 'add mode power: %s' % (power)
-
         if not add_mode_power:
             panel_power = noise_value
             print 'panel power level: no panel signal detected'
@@ -112,25 +117,50 @@ class comparison_py_f(gr.sync_block):
             panel_power = max(add_mode_power)
             print 'panel power level: %s' % (panel_power)
 
-        # normal = False
-        # secure = False
-        # some = False
+        normal = False
+        secure = False
+        some = False
 
-        # if panel_power > self.secure_threshold:
-        #     secure = True
-        # if panel_power > self.normal_threshold:
-        #     normal = True
-        # if panel_power > (noise_value+5):
-        #     some = True
+        if panel_power > self.secure_threshold:
+            secure = True
+        if panel_power > self.normal_threshold:
+            normal = True
+        if panel_power > (noise_value+5):
+            some = True
 
-        # Print for now, will be lighting of LEDs.
-        # if secure:
-        #     print "secure"
-        # if normal:
-        #     print "normal"
-        # if some:
-        #     print "some"
-        # else:
-        #     print "no signal detected"
+        if secure:
+            print "secure"
+	    	on(some_greenpin)
+	    	on(normal_greenpin)
+	    	on(secure_greenpin)
+        elif normal:
+            print "normal"
+	    	on(some_greenpin)
+	    	on(normal_greenpin)
+	    	on(secure_redpin)
+        elif some:
+            print "some"
+            on(some_greenpin)
+	    	on(normal_redpin)
+	    	on(secure_redpin)
+        else:
+            print "no signal detected"
+			on(some_redpin)
+			on(normal_redpin)
+			on(secure_redpin)
+
+		time.sleep(120)
+		off(some_greenpin)
+		off(some_redpin)
+		off(normal_greenpin)
+		off(normal_redpin)
+		off(secure_greenpin)
+		off(secure_redpin)
+
+		# run button code on startup and never kill it
+		# button press will
+			# (re)start capture/measure code
+			# turn off LEDs
+			# maybe blink LEDs to indicate it's starting?
 
         return len(input_items[0])

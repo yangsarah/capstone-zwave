@@ -1,0 +1,30 @@
+INCLUDE(FindPkgConfig)
+PKG_CHECK_MODULES(PC_COMPARISON comparison)
+
+FIND_PATH(
+    COMPARISON_INCLUDE_DIRS
+    NAMES comparison/api.h
+    HINTS $ENV{COMPARISON_DIR}/include
+        ${PC_COMPARISON_INCLUDEDIR}
+    PATHS ${CMAKE_INSTALL_PREFIX}/include
+          /usr/local/include
+          /usr/include
+)
+
+FIND_LIBRARY(
+    COMPARISON_LIBRARIES
+    NAMES gnuradio-comparison
+    HINTS $ENV{COMPARISON_DIR}/lib
+        ${PC_COMPARISON_LIBDIR}
+    PATHS ${CMAKE_INSTALL_PREFIX}/lib
+          ${CMAKE_INSTALL_PREFIX}/lib64
+          /usr/local/lib
+          /usr/local/lib64
+          /usr/lib
+          /usr/lib64
+)
+
+INCLUDE(FindPackageHandleStandardArgs)
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(COMPARISON DEFAULT_MSG COMPARISON_LIBRARIES COMPARISON_INCLUDE_DIRS)
+MARK_AS_ADVANCED(COMPARISON_LIBRARIES COMPARISON_INCLUDE_DIRS)
+

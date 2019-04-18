@@ -1,0 +1,9 @@
+/usr/local/lib/cmake/comparison/comparisonConfig.cmake
+/usr/local/include/comparison/api.h
+/usr/local/lib/python2.7/dist-packages/comparison/__init__.py
+/usr/local/lib/python2.7/dist-packages/comparison/comparison_py_f.py
+/usr/local/lib/python2.7/dist-packages/comparison/__init__.pyc
+/usr/local/lib/python2.7/dist-packages/comparison/comparison_py_f.pyc
+/usr/local/lib/python2.7/dist-packages/comparison/__init__.pyo
+/usr/local/lib/python2.7/dist-packages/comparison/comparison_py_f.pyo
+/usr/local/share/gnuradio/grc/blocks/comparison_comparison_py_f.xml
