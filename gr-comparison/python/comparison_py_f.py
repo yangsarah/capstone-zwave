@@ -25,13 +25,12 @@ import sys
 import RPi.GPIO as GPIO
 from gnuradio import gr
 
-# TODO change names to some, normal, and secure, assign pins
-led1_redpin = 11
-led1_greenpin = 13
-led2_redpin = 15
-led2_greenpin = 12
-led3_redpin = 16
-led3_greenpin = 18
+some_redpin = 17
+some_greenpin = 2
+normal_redpin = 26
+normal_greenpin = 6
+secure_redpin = 5
+secure_greenpin = 25
 
 class comparison_py_f(gr.sync_block):
     """
@@ -45,14 +44,18 @@ class comparison_py_f(gr.sync_block):
             in_sig=[(numpy.float32,1250000)],
             out_sig=None)
 
+	GPIO.setmode(GPIO.BCM)
+	GPIO.setup(some_redpin, GPIO.OUT)
+	GPIO.setup(some_greenpin, GPIO.OUT)
+	GPIO.setup(normal_redpin, GPIO.OUT)
+	GPIO.setup(normal_greenpin, GPIO.OUT)
+	GPIO.setup(secure_redpin, GPIO.OUT)
+	GPIO.setup(secure_greenpin, GPIO.OUT)
+
     def on(pin):
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin,GPIO.OUT)
         GPIO.output(pin,GPIO.HIGH)
 
     def off(pin):
-        GPIO.setmode(GPIO.BOARD)
-        GPIO.setup(pin,GPIO.OUT)
         GPIO.output(pin,GPIO.LOW)
 
     def work(self, input_items, output_items):
@@ -67,12 +70,12 @@ class comparison_py_f(gr.sync_block):
         stable_length = 0
         stable_runs = [] # List of tuples (start index, length, value).
 
-        # Collect list of add mode-length stable runs starting at 100k.
+        # Collect list of add mode-length stable runs starting at 50k.
         for i in range(50000, num_samples):
             if abs(stable_value-samples[i]) < 2:
                 stable_length += 1
             else:
-                if stable_length >= 5000:
+                if stable_length >= 20000 and stable_length <= 100000: # Expected add mode panel signal length.
                     run = (stable_start, stable_length, stable_value)
                     stable_runs.append(run)
                 stable_value = samples[i]
@@ -100,8 +103,7 @@ class comparison_py_f(gr.sync_block):
             elif noise and not last_noise:
                 spike_end = tup[0]
                 total_spike_length = spike_end - spike_start
-                if total_spike_length > 20000 and total_spike_length < 100000: # Append only add mode spikes.
-                    spikes.append(spike)
+                spikes.append(spike)
 
             last_noise = noise
 
@@ -156,11 +158,5 @@ class comparison_py_f(gr.sync_block):
 		off(normal_redpin)
 		off(secure_greenpin)
 		off(secure_redpin)
-
-		# run button code on startup and never kill it
-		# button press will
-			# (re)start capture/measure code
-			# turn off LEDs
-			# maybe blink LEDs to indicate it's starting?
 
         return len(input_items[0])
