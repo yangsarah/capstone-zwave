@@ -45,24 +45,24 @@ class comparison_py_f(gr.sync_block):
             in_sig=[(numpy.float32,1250000)],
             out_sig=None)
 
-	GPIO.setmode(GPIO.BCM)
-	GPIO.setup(some_redpin, GPIO.OUT)
-	GPIO.setup(some_greenpin, GPIO.OUT)
-	GPIO.setup(normal_redpin, GPIO.OUT)
-	GPIO.setup(normal_greenpin, GPIO.OUT)
-	GPIO.setup(secure_redpin, GPIO.OUT)
-	GPIO.setup(secure_greenpin, GPIO.OUT)
+    GPIO.setmode(GPIO.BCM)
+    GPIO.setup(some_redpin, GPIO.OUT)
+    GPIO.setup(some_greenpin, GPIO.OUT)
+    GPIO.setup(normal_redpin, GPIO.OUT)
+    GPIO.setup(normal_greenpin, GPIO.OUT)
+    GPIO.setup(secure_redpin, GPIO.OUT)
+    GPIO.setup(secure_greenpin, GPIO.OUT)
 
     def kill_reading():
-	pid = 0
-	processes = os.popen("ps a | grep 'python take_reading.py'").readlines()
-	for process in processes:
-	    if process.split()[4] == 'python' and process.split()[5] == 'take_reading.py':
-		pid = process.split()[0]
-		break
-	if pid != 0:
-	    command = "kill -9 " + pid
-	    os.system(command)
+        pid = 0
+        processes = os.popen("ps a | grep 'python take_reading.py'").readlines()
+        for process in processes:
+            if process.split()[4] == 'python' and process.split()[5] == 'take_reading.py':
+                pid = process.split()[0]
+                break
+        if pid != 0:
+            command = "kill -9 " + pid
+            os.system(command)
 
     def on(pin):
         GPIO.output(pin,GPIO.HIGH)
@@ -116,7 +116,6 @@ class comparison_py_f(gr.sync_block):
                 spike_end = tup[0]
                 total_spike_length = spike_end - spike_start
                 spikes.append(spike)
-
             last_noise = noise
 
         add_mode_power = []
@@ -144,33 +143,33 @@ class comparison_py_f(gr.sync_block):
 
         if secure:
             print "secure"
-	    	on(some_greenpin)
-	    	on(normal_greenpin)
-	    	on(secure_greenpin)
+            on(some_greenpin)
+            on(normal_greenpin)
+            on(secure_greenpin)
         elif normal:
             print "normal"
-	    	on(some_greenpin)
-	    	on(normal_greenpin)
-	    	on(secure_redpin)
+            on(some_greenpin)
+            on(normal_greenpin)
+            on(secure_redpin)
         elif some:
             print "some"
             on(some_greenpin)
-	    	on(normal_redpin)
-	    	on(secure_redpin)
+            on(normal_redpin)
+            on(secure_redpin)
         else:
             print "no signal detected"
-			on(some_redpin)
-			on(normal_redpin)
-			on(secure_redpin)
+            on(some_redpin)
+            on(normal_redpin)
+            on(secure_redpin)
 
-		time.sleep(120)
-		off(some_greenpin)
-		off(some_redpin)
-		off(normal_greenpin)
-		off(normal_redpin)
-		off(secure_greenpin)
-		off(secure_redpin)
+        time.sleep(120)
+        off(some_greenpin)
+        off(some_redpin)
+        off(normal_greenpin)
+        off(normal_redpin)
+        off(secure_greenpin)
+        off(secure_redpin)
 
-	kill_reading()
+    kill_reading()
 
-        return len(input_items[0])
+    return len(input_items[0])
