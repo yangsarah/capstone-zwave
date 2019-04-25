@@ -33,6 +33,23 @@ normal_greenpin = 6
 secure_redpin = 5
 secure_greenpin = 25
 
+def on(pin):
+        GPIO.output(pin,GPIO.HIGH)
+
+def off(pin):
+    GPIO.output(pin,GPIO.LOW)
+    
+def kill_reading():
+        pid = 0
+        processes = os.popen("ps a | grep 'python take_reading.py'").readlines()
+        for process in processes:
+            if process.split()[4] == 'python' and process.split()[5] == 'take_reading.py':
+                pid = process.split()[0]
+                break
+        if pid != 0:
+            command = "kill -9 " + pid
+            os.system(command)
+
 class comparison_py_f(gr.sync_block):
     """
     docstring for block comparison_py_f
@@ -45,30 +62,13 @@ class comparison_py_f(gr.sync_block):
             in_sig=[(numpy.float32,1250000)],
             out_sig=None)
 
-    GPIO.setmode(GPIO.BCM)
-    GPIO.setup(some_redpin, GPIO.OUT)
-    GPIO.setup(some_greenpin, GPIO.OUT)
-    GPIO.setup(normal_redpin, GPIO.OUT)
-    GPIO.setup(normal_greenpin, GPIO.OUT)
-    GPIO.setup(secure_redpin, GPIO.OUT)
-    GPIO.setup(secure_greenpin, GPIO.OUT)
-
-    def kill_reading():
-        pid = 0
-        processes = os.popen("ps a | grep 'python take_reading.py'").readlines()
-        for process in processes:
-            if process.split()[4] == 'python' and process.split()[5] == 'take_reading.py':
-                pid = process.split()[0]
-                break
-        if pid != 0:
-            command = "kill -9 " + pid
-            os.system(command)
-
-    def on(pin):
-        GPIO.output(pin,GPIO.HIGH)
-
-    def off(pin):
-        GPIO.output(pin,GPIO.LOW)
+        GPIO.setmode(GPIO.BCM)
+        GPIO.setup(some_redpin, GPIO.OUT)
+        GPIO.setup(some_greenpin, GPIO.OUT)
+        GPIO.setup(normal_redpin, GPIO.OUT)
+        GPIO.setup(normal_greenpin, GPIO.OUT)
+        GPIO.setup(secure_redpin, GPIO.OUT)
+        GPIO.setup(secure_greenpin, GPIO.OUT)
 
     def work(self, input_items, output_items):
         in0 = input_items[0]
@@ -170,6 +170,6 @@ class comparison_py_f(gr.sync_block):
         off(secure_greenpin)
         off(secure_redpin)
 
-    kill_reading()
+        kill_reading()
 
-    return len(input_items[0])
+        return len(input_items[0])
