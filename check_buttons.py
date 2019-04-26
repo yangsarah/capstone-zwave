@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 from subprocess import call
-import os
 import time
 import RPi.GPIO as GPIO
 
@@ -17,25 +16,33 @@ take_reading_pin = 16
 
 GPIO.setmode(GPIO.BCM)
 GPIO.setup(power_button_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(take_reading_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(some_redpin, GPIO.OUT)
+GPIO.setup(some_greenpin, GPIO.OUT)
+GPIO.setup(normal_redpin, GPIO.OUT)
+GPIO.setup(normal_greenpin, GPIO.OUT)
+GPIO.setup(secure_redpin, GPIO.OUT)
+GPIO.setup(secure_greenpin, GPIO.OUT)
 
 def on(pin):
-        GPIO.output(pin,GPIO.HIGH)
+    GPIO.output(pin,GPIO.HIGH)
 
 def off(pin):
     GPIO.output(pin,GPIO.LOW)
 
 def kill_reading():
     pid = 0
-    processes = os.popen("ps a | grep 'python prog.py'").readlines()
+    processes = os.popen("ps aux | grep 'python2 /home/pi/Documents/capstone-zwave/take_reading.py'").readlines()
     for process in processes:
-        if process.split()[4] == 'python' and process.split()[5] == 'prog.py':
-            pid = process.split()[0]
+        if process.split()[10] == 'python' and process.split()[11] == '/home/pi/Documents/capstone-zwave/take_reading.py':
+            pid = process.split()[1]
             break
     if(pid != 0):
         command = "kill -9 " + pid
         os.system(command)
 
-def main():while True:
+def main():
+    while True:
         # When power button pressed, turn off Pi.
         if not GPIO.input(power_button_pin):
             call(['shutdown', '-h', 'now'], shell=False)
@@ -50,16 +57,16 @@ def main():while True:
             off(secure_greenpin)
             off(secure_redpin)
             
-            for i in range(0:3):
+            for i in range(3):
                 on(some_greenpin)
                 on(normal_greenpin)
                 on(secure_greenpin)
-                time.sleep(.25)
+                time.sleep(.20)
                 off(some_greenpin)
                 off(normal_greenpin)
                 off(secure_greenpin)
-                time.sleep(.25)
+                time.sleep(.1)
             
-            call os.system("python take_reading.py &")
+            call(['python', '/home/pi/Documents/capstone-zwave/take_reading.py'], shell=False)
             
 main()
